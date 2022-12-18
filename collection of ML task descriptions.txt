@@ -1,0 +1,32 @@
+ELEARN:
+The basic requirement for the ML assignment that you need to fulfil in order to pass the assignment.
+
+Pre-processing 
+
+Clean data; Remove all the irrelevant/ noise from given data set
+
+Feature encoding
+
+    BOW
+    TF-IDF
+
+Data split
+
+         Split data into training and testing data 
+         Can perform Cross validation (optional)
+
+Designed and train Machine Learning model
+
+    Support vector Machine (SVM)
+    Random Forest (RF)
+    Naive Bayes
+
+Provide Model Evaluation
+
+    Accuracy
+    Recall
+    Precision
+    F1-score
+
+You are not restricted to using only these feature encoding techniques and models; 
+you can experiment with other ML models and can carry out some feature engineering.
