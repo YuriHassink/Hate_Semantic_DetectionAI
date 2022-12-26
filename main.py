@@ -28,7 +28,7 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 20147,
+    "rowCount": 2000,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -44,18 +44,27 @@ file: DataFrame = ps.read_csv("Hatespeech_dataset.csv")[0:Settings["rowCount"]]
 
 """Preprocessing and Cleaning"""
 preprocessing.setFileAndSettings(file,Settings)
-# preprocessing.undecidedToNontoxic()
-preprocessing.removeDots()  # works.
-preprocessing.upperToLower()  # works.
-preprocessing.addTextToStringAndTextToList()  # works.
+preprocessing.removeDots()
+preprocessing.upperToLower()
 # executed at this point as no words have been removed yet, following funcs
 # add a col or modify length of comments in col file["text"]
-votedHatewordDict: dict = preprocessing.processVotedHatewords(Settings["votingMode"])
-printDictSize("hateword",votedHatewordDict)
-preprocessing.removeStopwords()  # works.
-preprocessing.stemWords()  # works.
+# votedHatewordDict: dict = preprocessing.processVotedHatewords(Settings["votingMode"])
+# printDictSize("hateword",votedHatewordDict)
+preprocessing.removeStopwords()
+preprocessing.stemWords()
+preprocessing.addTextToStringAndTextToList()
+preprocessing.removeUndecided()
+
+# # set textasList as Hateword List in all toxic comments
+# i :int=0
+# for label in file["final_label"]:
+#     if label == "toxic":
+#         #overwrite with only voted hate words
+#         file.at[i,"textasList"]=file.at[i,"mostInclusiveWordList"]
+#     i += 1
 
 file = preprocessing.getFile()[Settings["platform"]]
+
 print("preprocessing fertig!")
 
 """Machine Learning"""
@@ -63,6 +72,7 @@ print("preprocessing fertig!")
 if Settings["featureEncoding"] == "bow":
     bow.setFile(file)
     bow.calcListOfBows()
+
     file = bow.getFile()
     print("bow fertig berechnet")
 else:
@@ -71,13 +81,8 @@ else:
     file = tfIdf.getFile()
     print("tfIDF fertig berechnet")
 
-"""Undecided zeilen löschen"""
-preprocessing.removeUndecided()
-# file = preprocessing.getFile()[Settings["platform"]]
-
-ml.setFile(file)
+ml.setFile(file, Settings["featureEncoding"])
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
-ml.doSVM()
 ml.doNaiveBayes()
 ml.doRandomForest(Settings["TreeCount"])
-ml.doKNN()
+ml.doSVM('scale')

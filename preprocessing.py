@@ -40,12 +40,6 @@ def removeStopwords():
 
         i += 1
 
-    # for word in allWordsInOneString.split():
-    #    word = word.lower() # in case they arenet all lower cased
-    #    if word not in stopWords:
-    #       processed_word_list.append(word)
-    # return processed_word_list
-
 
 # uppercase -> lowercase
 def upperToLower():
@@ -80,16 +74,11 @@ def removeUndecided():
     global file
     file = file[file["final_label"] != "undecided"]
 
-def undecidedToNontoxic():
-    global file
-    for i in range(len(file["final_label"])):
-        if file["final_label"][i] == "undecided":
-            file.at[i, "final_label"] = "non-toxic"
-
 # To get the preprocessed file in the main.
 def getFile():
     global file
 
+    #Old version!
     # twitter = preprocessing_helper.ifContains(file, "post_id", "twitter")
     # gab = preprocessing_helper.ifContains(file, "post_id", "gab")
 
@@ -97,8 +86,8 @@ def getFile():
 
 # adds hateword freq cols, returns hateword corpuses: unanimous and mostInclusive
 # in: mode : gives back dict of types and calcs HatewordPercentage by this type:
-# 1: unanimous voting, : 2: most inclusive voting
-# out: dicts
+#     1: unanimous voting, : 2: most inclusive voting
+# out: dict : this dict contains all hate words, meaning the words given the mode, that were voted hateful/toxic
 def processVotedHatewords(mode:int) -> dict:
     #tests for 2 funcs in helper file:
     #print(preprocessing_helper.getUnanimousVoteList("[[1,0,1],[1,1,0],[1,0,0]]"))
@@ -109,6 +98,7 @@ def processVotedHatewords(mode:int) -> dict:
     file["HatewordPercentage"] = None
     file["UnanimousVoteList"] = None
     file["mostInclusiveVoteList"] = None
+    file["mostInclusiveWordList"] = None
     # index of row in file
     i = -1
     # select toxic comments
@@ -116,10 +106,11 @@ def processVotedHatewords(mode:int) -> dict:
         # update index of row
         i += 1
         if label == "toxic":
-            commentList = file.at[i, "textasList"]
+            commentList = ast.literal_eval(file.at[i, "text"])
             unanimousVoteList = preprocessing_helper.getUnanimousVoteList(file.at[i, "rationales"])
             mostInclusiveVoteList=preprocessing_helper.getMostInclusiveVoteList(file.at[i, "rationales"])
             file.at[i, "UnanimousVoteList"] = unanimousVoteList
+            file.at[i,"mostInclusiveVoteList"] = mostInclusiveVoteList
             file.at[i,"mostInclusiveWordList"] = preprocessing_helper.extractVotedHatewords(commentList, mostInclusiveVoteList)
 
             if mode==1:

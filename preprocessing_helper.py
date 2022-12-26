@@ -52,7 +52,7 @@ def alterText(file, a, b):
 # it holds that:
 # len(commentAsList)==len(voteList)
 # len(votedHateWordList)<= len(commentAsList)
-def extractVotedHatewords(commentAsList: list[str], voteList: list[int]) -> list([str]):
+def extractVotedHatewords(commentAsList, voteList):
     returnList = []
     # quick fix: voteList ist sometimes one smaller than other
     if len(voteList) != len(commentAsList):
@@ -68,7 +68,7 @@ def extractVotedHatewords(commentAsList: list[str], voteList: list[int]) -> list
 # in: annotatorList
 # out: a list with len(comment) containing unanimous voting of the annotators, meaning:
 # [1,0,1][1,1,0][1,0,0] -> [1,0,0]
-def getUnanimousVoteList(annotatorList: list[list[int]]) -> list[list[int]]:
+def getUnanimousVoteList(annotatorList):
     # the annotator list is a string in the csv => convert to proper list
     annotatorList = ast.literal_eval(annotatorList)
     unanimousVotumList = annotatorList[0]
@@ -89,7 +89,7 @@ def getUnanimousVoteList(annotatorList: list[list[int]]) -> list[list[int]]:
 # in: annotatorList
 # out: a list with len(comment) containing most inclusive voting of the annotators, meaning:
 # [1,0,1][1,0,0][0,0,0] -> [1,0,1]
-def getMostInclusiveVoteList(annotatorList: list[list[int]]) -> list[list[int]]:
+def getMostInclusiveVoteList(annotatorList):
     # the annotator list is a string in the csv => convert to proper list
     annotatorList = ast.literal_eval(annotatorList)
     mostInclusiveVotumList = annotatorList[0]

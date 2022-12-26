@@ -11,8 +11,6 @@ def allWords(file):
     for comment in file["textasList"]:
         for word in comment:
             dataCorpus.append(word)
-    print("unique words in comments")
-    print(len(dataCorpus))
     return(dataCorpus)
 
 
@@ -21,6 +19,7 @@ def allWordsSet(allWords):
     for word in allWords:
         if word not in allWordsSet:
             allWordsSet.append(word)
+    print("dataCorpus length: " + str(len(allWordsSet)))
     return(allWordsSet)
 
 
@@ -39,7 +38,6 @@ def calcListOfBows():
     listOfBows = []
     for comment in file["textasList"]:
         listOfBows.append(bow(comment, dataCorpus))
-
     file["bow"] = listOfBows
 
 #To get the file in the main

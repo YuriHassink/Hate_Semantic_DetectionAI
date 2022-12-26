@@ -65,8 +65,7 @@ def tfColumn():
         for word in comment:
             tfList.append(term_frequency(comment, word))
         tf.append(tfList)
-    file["tf"] = tf
-    #print(tf)   
+    file["tf"] = tf  
 
 #idf dict
 def idfDict():
@@ -80,33 +79,6 @@ def idfDict():
 
     return idf_dict
 
-#tfidf column
-def tfIdfColumn():
-    global file
-    tfColumn()
-    idf_dict = idfDict()
-
-
-    tf_idf = []
-    count = 0
-    for comment in file['textasList']:
-        #print(i)
-        tf_idf_List = []
-        for word in comment:
-            #print(word)
-            for j in range(len(comment)):
-                if comment[j] == word:
-                    tf_index = j
-            tf_val = file["tf"][count]
-            
-            tf_value = tf_val[j]
-            tfidf = float(idf_dict[word]) * float(tf_value)
-            tf_idf_List.append(tfidf)
-        tf_idf.append(tf_idf_List)
-        count+=1
-    file["tf_idf"] = tf_idf
-    #print(tf_idf)
-
 
 """
 Vorgehen:
@@ -117,9 +89,9 @@ def tfIdfColumnTwo():
     global dataCorpus
     dataCorpus = dataCorpus(allWords(file))
     tfColumn()
-    print("tf fertig berechnet")
+    print("tf calculated!")
     idf_dict = idfDict()
-    print("idf fertig berechnet!")
+    print("idf calculated!")
 
     tfIdfList = []
     row = 0
@@ -130,10 +102,11 @@ def tfIdfColumnTwo():
 
         w = 0
         for word in comment:
-            currentTfDict[word] = file["tf"][row][w]
+            currentTfDict[word] = list(file["tf"])[row][w]
             w += 1
 
         currentTf_idfDict = dict.fromkeys(dataCorpus, 0)
+        currentTf_idfDictStrforPPT = dict.fromkeys(dataCorpus, "")
         for word in currentTf_idfDict.keys():
             currentTf_idfDict[word] = idf_dict[word] * currentTfDict[word]
             
@@ -141,6 +114,7 @@ def tfIdfColumnTwo():
         row += 1
 
     file["tfIdf"] = tfIdfList
+    
     
 
 
