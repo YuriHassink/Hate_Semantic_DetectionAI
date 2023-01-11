@@ -30,7 +30,7 @@ def bow(comment, dataCorpus):
         bow[word] = comment.count(word)
     return(list(bow.values()))
 
-#Set file["bow"] as the list of bows.
+#Set file["bow"] as the list of bows.h
 def calcListOfBows():
     global file
 
