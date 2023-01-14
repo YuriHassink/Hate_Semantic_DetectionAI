@@ -24,8 +24,9 @@ def dataCorpus(wordset):
     for word in wordset:
       if word not in unique_wordset:
         unique_wordset.append(word)
-    print("unique words in comments")
+    print("unique words in comments:")
     print(len(unique_wordset))
+    print("")
     return unique_wordset
 
 #word for tf and idf

@@ -42,6 +42,9 @@ def printDictSize(name :str,dict :dict):
 
 file: DataFrame = ps.read_csv("Hatespeech_dataset.csv")[0:Settings["rowCount"]]
 
+print(Settings)
+print("")
+
 """Preprocessing and Cleaning"""
 preprocessing.setFileAndSettings(file,Settings)
 preprocessing.removeDots()
@@ -66,6 +69,7 @@ preprocessing.removeUndecided()
 file = preprocessing.getFile()[Settings["platform"]]
 
 print("preprocessing fertig!")
+print("")
 
 """Machine Learning"""
 
@@ -86,3 +90,7 @@ ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
 ml.doNaiveBayes()
 ml.doRandomForest(Settings["TreeCount"])
 ml.doSVM('scale')
+ml.doBERT()
+
+print("machine learning fertig")
+
