@@ -5,6 +5,8 @@ import bow
 import tfIdf
 import ml
 
+
+#i hate this project
 """
 Setting of Keys if everything should run on every comment:
     "printStatsToConsole": True,
