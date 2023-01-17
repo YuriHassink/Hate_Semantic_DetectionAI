@@ -3,6 +3,7 @@ from pandas import DataFrame
 import preprocessing
 import bow
 import tfIdf
+import wordtovector
 import ml
 
 """
@@ -17,8 +18,10 @@ Settings = {
     # prints stats to console
     "printStatsToConsole": True,
 
-    # Select "bow" or "tfIdf"
-    "featureEncoding": "tfIdf",
+    # Select "bow" or "tfIdf" or "w2v"
+    "featureEncoding": "w2v",
+    # How many features in word2vec
+    "featureCount": 1,
     # [0,1] == TestDataSizeInPercent
     "TestDataSizeInPercent": 0.2,
     # Size of Random Forest
@@ -28,7 +31,7 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 2000,
+    "rowCount": 20147,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -79,18 +82,24 @@ if Settings["featureEncoding"] == "bow":
 
     file = bow.getFile()
     print("bow fertig berechnet")
-else:
+if Settings["featureEncoding"] == "tfidf":
     tfIdf.setFile(file)
     tfIdf.tfIdfColumnTwo()
     file = tfIdf.getFile()
     print("tfIDF fertig berechnet")
+if Settings["featureEncoding"] == "w2v":
+    wordtovector.setFile(file)
+    wordtovector.w2vCol(Settings["featureCount"])
+    file = wordtovector.getFile()
+    print("w2v fertig berechSnet")
 
 ml.setFile(file, Settings["featureEncoding"])
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
-ml.doNaiveBayes()
+
+#ml.doNaiveBayes()
 ml.doRandomForest(Settings["TreeCount"])
-ml.doSVM('scale')
-ml.doBERT()
+#ml.doSVM('scale')
+# ml.doBERT()
 
 print("machine learning fertig")
 
