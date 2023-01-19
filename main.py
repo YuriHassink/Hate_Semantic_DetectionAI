@@ -1,9 +1,7 @@
 import pandas as ps
 from pandas import DataFrame
 import preprocessing
-import bow
-import tfIdf
-import wordtovector
+import bow, tfIdf, wordtovector
 import ml
 
 """
@@ -31,7 +29,7 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 20147,
+    "rowCount": 10,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -71,8 +69,11 @@ preprocessing.removeUndecided()
 
 file = preprocessing.getFile()[Settings["platform"]]
 
+print("###############################################")
 print("preprocessing fertig!")
+print("###############################################")
 print("")
+
 
 """Machine Learning"""
 
@@ -91,15 +92,18 @@ if Settings["featureEncoding"] == "w2v":
     wordtovector.setFile(file)
     wordtovector.w2vCol(Settings["featureCount"])
     file = wordtovector.getFile()
-    print("w2v fertig berechSnet")
+    print("w2v fertig berechnet")
 
 ml.setFile(file, Settings["featureEncoding"])
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
-
+#models:
 #ml.doNaiveBayes()
 ml.doRandomForest(Settings["TreeCount"])
 #ml.doSVM('scale')
-# ml.doBERT()
+ml.doBERT()
 
+print("###############################################")
 print("machine learning fertig")
+print("###############################################")
+
 

@@ -1,8 +1,13 @@
 # Needed!!!
 # pip install scikit-learn
 ##pip install seaborn
+from typing import Callable, List, Optional, Tuple
+import pandas as pd
+import optional as optional
 import torch
 from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForMaskedLM
+from sklearn.base import BaseEstimator, TransformerMixin
+from transformers import BertTokenizer, BertModel, BertConfig
 
 from sklearn import model_selection, svm, naive_bayes
 from sklearn.preprocessing import LabelEncoder
@@ -36,6 +41,7 @@ def setFile(fileArg, featureEncodingArg):
 #Train_X 20% texts, Test_X = 80% texts, Train_Y = labels of the Train_X texts, Test_Y = labels of the Test_X texts.
 def splitData(percentage: int, column: str):
     global Train_X, Test_X, Train_Y, Test_Y
+    #inputs features of comments and correct solution to prediction at the split percentage given in this func
     Train_X, Test_X, Train_Y, Test_Y = model_selection.train_test_split(list(file[featureEncoding]),file['final_label'],test_size=percentage, random_state = 0)
     
     #Encode the labels. 0 = non-toxic, 1 = toxic
@@ -44,15 +50,15 @@ def splitData(percentage: int, column: str):
     Train_Y = Encoder.transform(Train_Y)
     Test_Y = Encoder.transform(Test_Y)
 
-def doSVM(g):
+def doSVM(gamma):
     # Classifier - Algorithm - SVM
     # fit the training dataset on the classifier
-    SVM = svm.SVC(kernel='linear', gamma = g)
+    SVM = svm.SVC(kernel='linear', gamma = gamma)
     SVM.fit(Train_X, Train_Y)
     predictions_SVM = SVM.predict(Test_X)
     
     #Evaluation
-    evaluateAndPrintModel(predictions_SVM, "SVM", str(g))
+    evaluateAndPrintModel(predictions_SVM, "SVM", str(gamma))
 
 def doNaiveBayes():
     Naive = naive_bayes.MultinomialNB()
@@ -80,6 +86,7 @@ def doKNN():
     evaluateAndPrintModel(y_pred, "KNN", "")
 
 def doBERT():
+    """
     BertModel.from_pretrained("bert-base-uncased")
     # Load pre-trained model tokenizer (vocabulary)
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -102,18 +109,30 @@ def doBERT():
     # Convert inputs to PyTorch tensors
     tokens_tensor = torch.tensor([indexed_tokens])
     segments_tensors = torch.tensor([segments_ids])
+    """
 
+
+"""
+input:
+testPrediction : what the model produces as a prediction
+modelname : name of model
+specification : inputs to the model, can be left blank if N/A
+output:
+prints of evaluations of inputted model
+"""
 def evaluateAndPrintModel(testPrediction, modelname :str, specification: str):
 
+    """
     #Calculate Precision for testing
-    # TP = 0
-    # FP = 0
-    # for i in range(len(testPrediction)):
-    #     if testPrediction[i] == 1 and Test_Y[i] == 1:
-    #         TP += 1 
-    #     if testPrediction[i] == 1 and Test_Y[i] == 0:
-    #         FP += 1
-    # print(TP / (TP+FP))
+    TP = 0
+    FP = 0
+    for i in range(len(testPrediction)):
+        if testPrediction[i] == 1 and Test_Y[i] == 1:
+            TP += 1
+        if testPrediction[i] == 1 and Test_Y[i] == 0:
+            FP += 1
+    print(TP / (TP+FP))
+    """
 
     print("")
     print("Results for " + modelname + " " + featureEncoding + " " + specification)
@@ -135,6 +154,56 @@ def evaluateAndPrintModel(testPrediction, modelname :str, specification: str):
     #plt.savefig("figures/" + modelname + featureEncoding + str(specification) + ".png", dpi = 1000, format='png', transparent=True)
     plt.clf()
     print("")
+
+class BertTransformer(BaseEstimator, TransformerMixin):
+    def __init__(
+            self,
+            bert_tokenizer,
+            bert_model,
+            max_length: int = 60,
+            embedding_func: Optional[Callable[[torch.tensor], torch.tensor]] = None,
+    ):
+        self.tokenizer = bert_tokenizer
+        self.model = bert_model
+        self.model.eval()
+        self.max_length = max_length
+        self.embedding_func = embedding_func
+
+        if self.embedding_func is None:
+            self.embedding_func = lambda x: x[0][:, 0, :].squeeze()
+
+    def _tokenize(self, text: str) -> Tuple[torch.tensor, torch.tensor]:
+        # Tokenize the text with the provided tokenizer
+        tokenized_text = self.tokenizer.encode_plus(text,
+                                                    add_special_tokens=True,
+                                                    max_length=self.max_length
+                                                    )["input_ids"]
+
+        # Create an attention mask telling BERT to use all words
+        attention_mask = [1] * len(tokenized_text)
+
+        # bert takes in a batch so we need to unsqueeze the rows
+        return (
+            torch.tensor(tokenized_text).unsqueeze(0),
+            torch.tensor(attention_mask).unsqueeze(0),
+        )
+
+    def _tokenize_and_predict(self, text: str) -> torch.tensor:
+        tokenized, attention_mask = self._tokenize(text)
+
+        embeddings = self.model(tokenized, attention_mask)
+        return self.embedding_func(embeddings)
+
+    def transform(self, text: List[str]):
+        if isinstance(text, pd.Series):
+            text = text.tolist()
+
+        with torch.no_grad():
+            return torch.stack([self._tokenize_and_predict(string) for string in text])
+
+    def fit(self, X, y=None):
+        """No fitting necessary so we just return ourselves"""
+        return self
 
 
 
