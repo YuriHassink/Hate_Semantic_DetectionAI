@@ -7,12 +7,14 @@ import optional as optional
 import torch
 from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForMaskedLM
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.pipeline import FeatureUnion
 from transformers import BertTokenizer, BertModel, BertConfig
 
 from sklearn import model_selection, svm, naive_bayes
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
@@ -43,7 +45,7 @@ def splitData(percentage: int, column: str):
     global Train_X, Test_X, Train_Y, Test_Y
     #inputs features of comments and correct solution to prediction at the split percentage given in this func
     Train_X, Test_X, Train_Y, Test_Y = model_selection.train_test_split(list(file[featureEncoding]),file['final_label'],test_size=percentage, random_state = 0)
-    
+
     #Encode the labels. 0 = non-toxic, 1 = toxic
     Encoder = LabelEncoder()
     Encoder.fit(["non-toxic", "toxic"])
@@ -58,7 +60,7 @@ def doSVM(gamma):
     predictions_SVM = SVM.predict(Test_X)
     
     #Evaluation
-    evaluateAndPrintModel(predictions_SVM, "SVM", str(gamma))
+    evaluateAndPrintModel(predictions_SVM, "SVM","gamma being:" + str(gamma))
 
 def doNaiveBayes():
     Naive = naive_bayes.MultinomialNB()
@@ -76,7 +78,7 @@ def doRandomForest(treeCount :int):
     #give prediction
     y_pred = clf.predict(Test_X)
     # eval.:
-    evaluateAndPrintModel(y_pred, "Random Forest", str(treeCount))
+    evaluateAndPrintModel(y_pred, "Random Forest","treeCount being:" + str(treeCount))
 
 def doKNN():
     knn = KNeighborsClassifier()
@@ -85,7 +87,23 @@ def doKNN():
     # eval.:
     evaluateAndPrintModel(y_pred, "KNN", "")
 
-def doBERT():
+def doBERT(treeCount :int):
+    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    bert_model = BertModel.from_pretrained("bert-base-uncased")
+
+    bert_transformer = BertTransformer(tokenizer, bert_model)
+    classifier = RandomForestClassifier(n_estimators=treeCount)
+    model = Pipeline(
+        [
+            ("vectorizer", bert_transformer),
+            ("classifier", classifier),
+        ]
+    )
+    model.fit(Train_X, Train_Y)
+    y_pred = model.predict(Test_X)
+    evaluateAndPrintModel(y_pred, "BERT with RF","treeCount being:" + str(treeCount))
+
+    #demo next word prediction in a sentence
     """
     BertModel.from_pretrained("bert-base-uncased")
     # Load pre-trained model tokenizer (vocabulary)
@@ -111,6 +129,25 @@ def doBERT():
     segments_tensors = torch.tensor([segments_ids])
     """
 
+    #feature union: adding TF IDF features
+    """
+    from sklearn.feature_extraction.text import (
+        CountVectorizer, TfidfTransformer
+    )
+
+    tf_idf = Pipeline([
+        ("vect", CountVectorizer()),
+        ("tfidf", TfidfTransformer())
+    ])
+
+    model = Pipeline([
+        ("union", FeatureUnion(transformer_list=[
+            ("bert", bert_transformer),
+            ("tf_idf", tf_idf)
+        ])),
+        ("classifier", classifier),
+    ])
+    """
 
 """
 input:
@@ -121,18 +158,6 @@ output:
 prints of evaluations of inputted model
 """
 def evaluateAndPrintModel(testPrediction, modelname :str, specification: str):
-
-    """
-    #Calculate Precision for testing
-    TP = 0
-    FP = 0
-    for i in range(len(testPrediction)):
-        if testPrediction[i] == 1 and Test_Y[i] == 1:
-            TP += 1
-        if testPrediction[i] == 1 and Test_Y[i] == 0:
-            FP += 1
-    print(TP / (TP+FP))
-    """
 
     print("")
     print("Results for " + modelname + " " + featureEncoding + " " + specification)
@@ -155,6 +180,7 @@ def evaluateAndPrintModel(testPrediction, modelname :str, specification: str):
     plt.clf()
     print("")
 
+#custom transformer for our hate detection purposes built on top of BERT base
 class BertTransformer(BaseEstimator, TransformerMixin):
     def __init__(
             self,

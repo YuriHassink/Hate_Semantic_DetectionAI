@@ -16,8 +16,8 @@ Settings = {
     # prints stats to console
     "printStatsToConsole": True,
 
-    # Select "bow" or "tfIdf" or "w2v"
-    "featureEncoding": "w2v",
+    # Select "bow","tfIdf","w2v","BERT"
+    "featureEncoding": "tfIdf",
     # How many features in word2vec
     "featureCount": 1,
     # [0,1] == TestDataSizeInPercent
@@ -35,19 +35,13 @@ Settings = {
     "platform": 0
 }
 
-def printDictSize(name :str,dict :dict):
-    if Settings["printStatsToConsole"]:
-        print(name+" dict size:")
-        print(len(dict))
-        print("")
-
 file: DataFrame = ps.read_csv("Hatespeech_dataset.csv")[0:Settings["rowCount"]]
 
 print(Settings)
 print("")
 
 """Preprocessing and Cleaning"""
-preprocessing.setFileAndSettings(file,Settings)
+preprocessing.setFileAndSettings(file, Settings)
 preprocessing.removeDots()
 preprocessing.upperToLower()
 # executed at this point as no words have been removed yet, following funcs
@@ -74,36 +68,48 @@ print("preprocessing fertig!")
 print("###############################################")
 print("")
 
-
 """Machine Learning"""
 
+# encoding generation:
 if Settings["featureEncoding"] == "bow":
     bow.setFile(file)
     bow.calcListOfBows()
-
     file = bow.getFile()
     print("bow fertig berechnet")
-if Settings["featureEncoding"] == "tfidf":
+elif Settings["featureEncoding"] == "tfIdf":
     tfIdf.setFile(file)
     tfIdf.tfIdfColumnTwo()
     file = tfIdf.getFile()
     print("tfIDF fertig berechnet")
-if Settings["featureEncoding"] == "w2v":
+elif Settings["featureEncoding"] == "w2v":
     wordtovector.setFile(file)
     wordtovector.w2vCol(Settings["featureCount"])
     file = wordtovector.getFile()
     print("w2v fertig berechnet")
+elif Settings["featureEncoding"] == "BERT":
+    file["BERT"] = None
+    i = 0
+    #copy comment to new BERT col
+    for comment in file["textasStr"]:
+        file.at[i, "BERT"] = comment
+        i += 1
+else:
+    raise Exception("none of the supported encodings selected in Settings")
 
 ml.setFile(file, Settings["featureEncoding"])
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
-#models:
-#ml.doNaiveBayes()
+# models:
+# ml.doNaiveBayes()
 ml.doRandomForest(Settings["TreeCount"])
-#ml.doSVM('scale')
-ml.doBERT()
+# ml.doSVM('scale')
+# ml.doBERT(Settings["TreeCount"])
 
 print("###############################################")
 print("machine learning fertig")
 print("###############################################")
 
-
+def printDictSize(name: str, dict: dict):
+    if Settings["printStatsToConsole"]:
+        print(name + " dict size:")
+        print(len(dict))
+        print("")
