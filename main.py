@@ -1,7 +1,7 @@
 import pandas as ps
 from pandas import DataFrame
 import preprocessing
-import bow, tfIdf, wordtovector
+import bow, tfIdf, wordtovector, Gloves
 import ml
 
 """
@@ -16,8 +16,8 @@ Settings = {
     # prints stats to console
     "printStatsToConsole": True,
 
-    # Select "bow","tfIdf","w2v","BERT"
-    "featureEncoding": "tfIdf",
+    # Select "bow","tfIdf","w2v","BERT","gloves"
+    "featureEncoding": "w2v",
     # How many features in word2vec
     "featureCount": 1,
     # [0,1] == TestDataSizeInPercent
@@ -86,6 +86,11 @@ elif Settings["featureEncoding"] == "w2v":
     wordtovector.w2vCol(Settings["featureCount"])
     file = wordtovector.getFile()
     print("w2v fertig berechnet")
+elif Settings["featureEncoding"] == "gloves":
+    Gloves.setFile(file)
+    Gloves.doGloves(50)
+    file = Gloves.getFile()
+    print("gloves fertig berechnet")
 elif Settings["featureEncoding"] == "BERT":
     file["BERT"] = None
     i = 0
@@ -113,3 +118,4 @@ def printDictSize(name: str, dict: dict):
         print(name + " dict size:")
         print(len(dict))
         print("")
+
