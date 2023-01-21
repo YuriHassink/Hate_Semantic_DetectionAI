@@ -2,6 +2,7 @@
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 import numpy as np
+import ml
   
 file = None
 dataCorpus = None
@@ -74,11 +75,11 @@ def glovesCol(embedding_matrix_vocab):
     global dataCorpusDict
     
     #create an array and insert each word2Vec Vector
-    glovesCol = []
+    gloves = []
     for i in embedding_matrix_vocab:
         #Now create one vector per comment, which is just the average of the words vectors. 
-        glovesCol.append(sum(i)/len(i))
-    return glovesCol
+        gloves.append(sum(i)/len(i))
+    return gloves
 
 def doGloves(embedding_dim):
     global file
@@ -86,4 +87,5 @@ def doGloves(embedding_dim):
     embedding_matrix_vocab = embedding_for_vocab('glove.6B.50d.txt', glovesDict(),embedding_dim)
     print(embedding_matrix_vocab)
     print(glovesCol(embedding_matrix_vocab))
+    
     return embedding_matrix_vocab
