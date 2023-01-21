@@ -17,7 +17,7 @@ Settings = {
     "printStatsToConsole": True,
 
     # Select "bow","tfIdf","w2v","BERT","gloves"
-    "featureEncoding": "w2v",
+    "featureEncoding": "gloves",
     # How many features in word2vec
     "featureCount": 1,
     # [0,1] == TestDataSizeInPercent
@@ -29,7 +29,7 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 10,
+    "rowCount": 1,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -118,4 +118,3 @@ def printDictSize(name: str, dict: dict):
         print(name + " dict size:")
         print(len(dict))
         print("")
-
