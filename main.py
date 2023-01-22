@@ -17,7 +17,7 @@ Settings = {
     "printStatsToConsole": True,
 
     # Select "bow","tfIdf","w2v","BERT","gloves"
-    "featureEncoding": "gloves",
+    "featureEncoding": "BERT",
     # How many features in word2vec
     "featureCount": 1,
     # [0,1] == TestDataSizeInPercent
@@ -29,7 +29,7 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 1,
+    "rowCount": 20147,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -43,13 +43,14 @@ print("")
 """Preprocessing and Cleaning"""
 preprocessing.setFileAndSettings(file, Settings)
 preprocessing.removeDots()
-preprocessing.upperToLower()
-# executed at this point as no words have been removed yet, following funcs
-# add a col or modify length of comments in col file["text"]
-# votedHatewordDict: dict = preprocessing.processVotedHatewords(Settings["votingMode"])
-# printDictSize("hateword",votedHatewordDict)
-preprocessing.removeStopwords()
-preprocessing.stemWords()
+if Settings["featureEncoding"] != "BERT":
+    preprocessing.upperToLower()
+    # executed at this point as no words have been removed yet, following funcs
+    # add a col or modify length of comments in col file["text"]
+    # votedHatewordDict: dict = preprocessing.processVotedHatewords(Settings["votingMode"])
+    # printDictSize("hateword",votedHatewordDict)
+    preprocessing.removeStopwords()
+    preprocessing.stemWords()
 preprocessing.addTextToStringAndTextToList()
 preprocessing.removeUndecided()
 
@@ -92,22 +93,22 @@ elif Settings["featureEncoding"] == "gloves":
     file = Gloves.getFile()
     print("gloves fertig berechnet")
 elif Settings["featureEncoding"] == "BERT":
-    file["BERT"] = None
+    file[Settings["featureEncoding"]] = None
     i = 0
     #copy comment to new BERT col
     for comment in file["textasStr"]:
-        file.at[i, "BERT"] = comment
+        file.at[i, Settings["featureEncoding"]] = comment
         i += 1
 else:
     raise Exception("none of the supported encodings selected in Settings")
 
-ml.setFile(file, Settings["featureEncoding"])
+ml.setFile(file, Settings)
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
 # models:
 # ml.doNaiveBayes()
-ml.doRandomForest(Settings["TreeCount"])
+# ml.doRandomForest(Settings["TreeCount"])
 # ml.doSVM('scale')
-# ml.doBERT(Settings["TreeCount"])
+ml.doBERT(Settings["TreeCount"])
 
 print("###############################################")
 print("machine learning fertig")
