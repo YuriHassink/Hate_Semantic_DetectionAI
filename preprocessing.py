@@ -68,11 +68,27 @@ def addTextToStringAndTextToList():
         textasStrList.append(" ".join(ast.literal_eval(x)))
     file["textasStr"] = textasStrList
 
-    printTableState()
+    if Settings["printStatsToConsole"]:
+        print("added columns")
+        printTableState()
 
 def removeUndecided():
     global file
-    file = file[file["final_label"] != "undecided"]
+    undecidedCount=0
+    i=0
+    for label in file["final_label"]:
+        if label != "undecided":
+            file.at[i,"final_label"]=label
+        else:
+            #TODO: only a hotfix, sets undecided to non-toxic
+            file.at[i, "final_label"]="non-toxic"
+            undecidedCount+=1
+        i += 1
+    if Settings["printStatsToConsole"]:
+        print("undecidedCount in this selected dataset:")
+        print(undecidedCount)
+        print("")
+
 
 # To get the preprocessed file in the main.
 def getFile():

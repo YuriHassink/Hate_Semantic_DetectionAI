@@ -1,9 +1,11 @@
 import pandas as ps
 from pandas import DataFrame
+import time
 import preprocessing
 import bow, tfIdf, wordtovector, Gloves
 import ml
 
+tic = time.perf_counter()
 """
 Setting of Keys if everything should run on every comment:
     "printStatsToConsole": True,
@@ -15,6 +17,8 @@ Settings = {
 
     # prints stats to console
     "printStatsToConsole": True,
+    # show plots by pyplot
+    "showPlots" : False,
 
     # Select "bow","tfIdf","w2v","BERT","gloves"
     "featureEncoding": "BERT",
@@ -29,16 +33,40 @@ Settings = {
     "votingMode": 2,
 
     # [0,20147] == rowCount
-    "rowCount": 20147,
+    #20147   21  2014    5   201    50
+    "rowCount": 2014,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
 }
 
+#printer functions:
+def printDictSize(name: str, dict: dict):
+    if Settings["printStatsToConsole"]:
+        print(name + " dict size:")
+        print(len(dict))
+        print("")
+def printCol(percent :int,name :str)->None:
+    lastRowIndex=len(file[name])*percent/100
+    i=0
+    for cell in file[name]:
+        i+=1
+        print(cell)
+        if i==lastRowIndex: return
+
+def printBanneredText(text):
+    pass
+
+###########################################################
+#       Pipeline:
+
+#view a CSV well
+#https://csv-viewer-online.github.io/
 file: DataFrame = ps.read_csv("Hatespeech_dataset.csv")[0:Settings["rowCount"]]
 
-print(Settings)
-print("")
+if Settings["printStatsToConsole"]:
+    print(Settings)
+    print("")
 
 """Preprocessing and Cleaning"""
 preprocessing.setFileAndSettings(file, Settings)
@@ -68,6 +96,8 @@ print("###############################################")
 print("preprocessing fertig!")
 print("###############################################")
 print("")
+#tests:
+#if Settings["printStatsToConsole"]: print(printCol(100,"textasStr"))
 
 """Machine Learning"""
 
@@ -113,9 +143,8 @@ ml.doBERT(Settings["TreeCount"])
 print("###############################################")
 print("machine learning fertig")
 print("###############################################")
+print("")
 
-def printDictSize(name: str, dict: dict):
-    if Settings["printStatsToConsole"]:
-        print(name + " dict size:")
-        print(len(dict))
-        print("")
+print("time elapsed for this whole pipeline:")
+toc = time.perf_counter()
+print(f"{toc - tic:0.4f} seconds")
