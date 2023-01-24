@@ -121,7 +121,7 @@ def doKNN():
 
 #ValueError: Input contains NaN
 #http://jalammar.github.io/a-visual-guide-to-using-bert-for-the-first-time/
-def doBERT(treeCount :int):
+def doBERT():
     global Train_X, Test_X, Train_Y, Test_Y
     model_class, tokenizer_class, pretrained_weights = (ppb.BertModel, ppb.BertTokenizer, 'bert-base-uncased')
     tokenizer = tokenizer_class.from_pretrained(pretrained_weights)
@@ -138,19 +138,18 @@ def doBERT(treeCount :int):
 
     last_hidden_states1=calcLastStatesBert(padded1,attention_mask1,model)
     last_hidden_states2=calcLastStatesBert(padded2,attention_mask2,model)
-    print("")
 
     Train_X = last_hidden_states1[0][:, 0, :].numpy()
     Test_X = last_hidden_states2[0][:, 0, :].numpy()
 
-    clf=RandomForestClassifier(n_estimators=treeCount)
+    clf=LogisticRegression()
     clf.fit(Train_X, Train_Y)
 
     print("time elapsed for BERT encoding processing and running it in model:")
     toc = time.perf_counter()
     print(f"{toc - tic:0.4f} seconds")
     y_pred=clf.predict(Test_X)
-    evaluateAndPrintModel(y_pred, "BERT with RandomForestClassifier","treeCount being:" + str(treeCount))
+    evaluateAndPrintModel(y_pred, "BERT with LogisticRegression","")
 
     """ runs table:
     Rowcount    Time    Accuracy Comment

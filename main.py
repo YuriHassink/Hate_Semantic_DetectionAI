@@ -138,7 +138,7 @@ ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
 # ml.doNaiveBayes()
 # ml.doRandomForest(Settings["TreeCount"])
 # ml.doSVM('scale')
-ml.doBERT(Settings["TreeCount"])
+ml.doBERT()
 
 print("###############################################")
 print("machine learning fertig")
