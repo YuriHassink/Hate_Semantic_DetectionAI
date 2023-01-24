@@ -52,8 +52,7 @@ def doGloves(featureCount):
                 glovesDict[word] = vector[0:featureCount]
             if stemmer.stem(word) in dataCorpus:
                 glovesDict[stemmer.stem(word)] = vector[0:featureCount]
-    
-    
+
     #create an array and insert each word2Vec Vector
     glovesCol = []
 

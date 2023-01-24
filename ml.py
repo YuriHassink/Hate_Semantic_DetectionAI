@@ -135,6 +135,7 @@ def doBERT(treeCount :int):
     attention_mask2 = np.where(padded2 != 0, 1, 0)
 
     tic = time.perf_counter()
+
     last_hidden_states1=calcLastStatesBert(padded1,attention_mask1,model)
     last_hidden_states2=calcLastStatesBert(padded2,attention_mask2,model)
     print("")
@@ -152,12 +153,21 @@ def doBERT(treeCount :int):
     evaluateAndPrintModel(y_pred, "BERT with RandomForestClassifier","treeCount being:" + str(treeCount))
 
     """ runs table:
-    Rowcount    Time    Accuracy
+    Rowcount    Time    Accuracy Comment
     2014        430s    66.5
+    2014        400s    66.2
+    
+    2014        398s    68.2    with further preprocessing
+    2014        412s    64.0
+    
     201         32s     60.9
     201         27s     60.9
     201         33s     63.4
     
+    201         33s     58.5    with further preprocessing
+    201         31s     70.7    with further preprocessing
+    201         33s     60.9    with further preprocessing         
+    201         30s     56.0    with further preprocessing     
     """
 
     #code using BertTransformer class

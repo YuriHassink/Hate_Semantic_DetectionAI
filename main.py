@@ -18,7 +18,7 @@ Settings = {
     # prints stats to console
     "printStatsToConsole": True,
     # show plots by pyplot
-    "showPlots" : False,
+    "showPlots" : True,
 
     # Select "bow","tfIdf","w2v","BERT","gloves"
     "featureEncoding": "BERT",
@@ -27,14 +27,14 @@ Settings = {
     # [0,1] == TestDataSizeInPercent
     "TestDataSizeInPercent": 0.2,
     # Size of Random Forest
-    "TreeCount": 100,
+    "TreeCount": 300,
     # unanimous, all 3 vote for it to be a hate word (1)
     # or most inclusive (2) voting in rationales on a hate word
     "votingMode": 2,
 
     # [0,20147] == rowCount
     #20147   21  2014    5   201    50
-    "rowCount": 2014,
+    "rowCount": 50,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0

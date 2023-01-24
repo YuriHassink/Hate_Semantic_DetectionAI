@@ -15,6 +15,7 @@ def getFile():
     global file
     return file
 
+#making of data corpus of all words
 def allWords(file):
     dataCorpus = []
     for comment in file["textasList"]:
@@ -22,6 +23,7 @@ def allWords(file):
             dataCorpus.append(word)
     return(dataCorpus)
 
+#creates set version of above func
 def allWordsSet(allWords):
     allWordsSet = []
     for word in allWords:
@@ -31,7 +33,7 @@ def allWordsSet(allWords):
     return allWordsSet
 
 
-#Add the column "w2v" to the file.
+#Add the column "w2v" to the file:
 def w2vCol(featureCount):
 
     global file
