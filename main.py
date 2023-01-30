@@ -24,6 +24,10 @@ Settings = {
     "featureEncoding": "BERT",
     # How many features in word2vec
     "featureCount": 1,
+    #which model the feature encoding should run through, modelIndexes[i]==[0,4]
+    #Select NB,RF,SVM,LogisticRegression,LSTM indexes that should run on the feature encodings
+    # f.e.: index 3 would run LogisticRegression
+    "modelIndexes" : [3],
     # [0,1] == TestDataSizeInPercent
     "TestDataSizeInPercent": 0.2,
     # Size of Random Forest
@@ -34,7 +38,7 @@ Settings = {
 
     # [0,20147] == rowCount
     #20147   21  2014    5   201    50
-    "rowCount": 50,
+    "rowCount": 5,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -134,11 +138,21 @@ else:
 
 ml.setFile(file, Settings)
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
-# models:
-# ml.doNaiveBayes()
-# ml.doRandomForest(Settings["TreeCount"])
-# ml.doSVM('scale')
-ml.doBERT()
+
+for index in Settings["modelIndexes"]:
+    i=0
+    if index==i:
+        ml.doNaiveBayes()
+    elif index==1:
+        ml.doRandomForest(Settings["TreeCount"])
+    elif index ==2:
+        ml.doSVM('scale')
+    elif index ==3:
+        ml.doBERT("logisticRegression")
+    elif index ==4:
+        ml.doBERT("LSTM")
+    else:
+        raise Exception("index out of range")
 
 print("###############################################")
 print("machine learning fertig")

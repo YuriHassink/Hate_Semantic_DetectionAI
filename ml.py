@@ -9,7 +9,6 @@ import os
 import time
 #import hardware_control
 
-from BertTransformer import BertTransformer
 from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForMaskedLM
 from sklearn.pipeline import FeatureUnion
 
@@ -121,12 +120,13 @@ def doKNN():
 
 #ValueError: Input contains NaN
 #http://jalammar.github.io/a-visual-guide-to-using-bert-for-the-first-time/
-def doBERT():
+def doBERT(modelSelected :str):
     global Train_X, Test_X, Train_Y, Test_Y
     model_class, tokenizer_class, pretrained_weights = (ppb.BertModel, ppb.BertTokenizer, 'bert-base-uncased')
     tokenizer = tokenizer_class.from_pretrained(pretrained_weights)
     model = model_class.from_pretrained(pretrained_weights)
-
+    if Settings["printStatsToConsole"]:
+        print(tokenizer)
     tokenized1 = Train_X.apply((lambda x: encodeBERT(x,tokenizer)))
     tokenized2 = Test_X.apply((lambda x: encodeBERT(x,tokenizer)))
     padded1=padTokenized(tokenized1)
@@ -142,7 +142,13 @@ def doBERT():
     Train_X = last_hidden_states1[0][:, 0, :].numpy()
     Test_X = last_hidden_states2[0][:, 0, :].numpy()
 
-    clf=LogisticRegression()
+    clf=None
+    if modelSelected=="logisticRegression":
+        clf = LogisticRegression()
+    elif modelSelected=="LSTM":
+        raise Exception("unimplemented!")
+    else:
+        raise Exception("invalid model called to doBert encoding model")
     clf.fit(Train_X, Train_Y)
 
     print("time elapsed for BERT encoding processing and running it in model:")
@@ -167,24 +173,6 @@ def doBERT():
     201         31s     70.7    with further preprocessing
     201         33s     60.9    with further preprocessing         
     201         30s     56.0    with further preprocessing     
-    """
-
-    #code using BertTransformer class
-    """
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-    bert_model = BertModel.from_pretrained("bert-base-uncased")
-
-    bert_transformer = BertTransformer(tokenizer, bert_model)
-    classifier = RandomForestClassifier(n_estimators=treeCount)
-    model = Pipeline(
-        [
-            ("vectorizer", bert_transformer),
-            ("classifier", classifier),
-        ]
-    )
-    model.fit(Train_X, Train_Y)
-    y_pred = model.predict(Test_X)
-    evaluateAndPrintModel(y_pred, "BERT with RF","treeCount being:" + str(treeCount))
     """
 
 """
