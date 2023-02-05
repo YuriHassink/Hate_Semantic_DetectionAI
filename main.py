@@ -34,7 +34,7 @@ Settings = {
 
     # [0,20147] == rowCount
     #20147   21  2014    5   201    50
-    "rowCount": 50,
+    "rowCount": 2014,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -70,15 +70,15 @@ if Settings["printStatsToConsole"]:
 
 """Preprocessing and Cleaning"""
 preprocessing.setFileAndSettings(file, Settings)
-preprocessing.removeDots()
-if Settings["featureEncoding"] != "BERT":
-    preprocessing.upperToLower()
+#preprocessing.removeDots()
+#if Settings["featureEncoding"] != "BERT":
+#    preprocessing.upperToLower()
     # executed at this point as no words have been removed yet, following funcs
     # add a col or modify length of comments in col file["text"]
     # votedHatewordDict: dict = preprocessing.processVotedHatewords(Settings["votingMode"])
     # printDictSize("hateword",votedHatewordDict)
-    preprocessing.removeStopwords()
-    preprocessing.stemWords()
+#    preprocessing.removeStopwords()
+#    preprocessing.stemWords()
 preprocessing.addTextToStringAndTextToList()
 preprocessing.removeUndecided()
 

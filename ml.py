@@ -10,7 +10,6 @@ import time
 #import hardware_control
 
 from BertTransformer import BertTransformer
-from pytorch_pretrained_bert import BertTokenizer, BertModel, BertForMaskedLM
 from sklearn.pipeline import FeatureUnion
 
 from sklearn import model_selection, svm, naive_bayes
