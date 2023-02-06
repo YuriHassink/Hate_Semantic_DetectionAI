@@ -1,3 +1,5 @@
+import os
+
 import pandas as ps
 from pandas import DataFrame
 import time
@@ -34,7 +36,7 @@ Settings = {
 
     # [0,20147] == rowCount
     #20147   21  2014    5   201    50
-    "rowCount": 2014,
+    "rowCount": 5000,
     #  Select which file to do the EDA with:
     # 0 = Both Platforms, 1 = twitter, 2 = gab
     "platform": 0
@@ -132,6 +134,7 @@ elif Settings["featureEncoding"] == "BERT":
 else:
     raise Exception("none of the supported encodings selected in Settings")
 
+#TODO: make a statement which prints the current os time
 ml.setFile(file, Settings)
 ml.splitData(Settings["TestDataSizeInPercent"], Settings["featureEncoding"])
 # models:

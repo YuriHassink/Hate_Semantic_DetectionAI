@@ -17,6 +17,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
+import pickle
 
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
@@ -150,8 +151,12 @@ def doBERT():
     y_pred=clf.predict(Test_X)
     evaluateAndPrintModel(y_pred, "BERT with LogisticRegression","")
 
+    filename = "model.pickle"
+    pickle.dump(clf, open(filename, "wb"))
     """ runs table:
     Rowcount    Time    Accuracy Comment
+    5000        831s    73.8   ran with logistic regression and minimal preprocessing
+    
     2014        430s    66.5
     2014        400s    66.2
     
