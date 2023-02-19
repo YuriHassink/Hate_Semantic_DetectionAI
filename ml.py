@@ -155,7 +155,7 @@ def doBERT():
     pickle.dump(clf, open(filename, "wb"))
     """ runs table:
     Rowcount    Time    Accuracy Comment
-    5000        831s    73.8   ran with logistic regression and minimal preprocessing
+    5000        831s    73.8   ran with logistic regression and minimal preprocessing, saved it in pickle
     
     2014        430s    66.5
     2014        400s    66.2
