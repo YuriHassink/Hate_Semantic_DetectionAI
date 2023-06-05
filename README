@@ -1,0 +1,16 @@
+Runs of Bert with RF:
+    Rowcount    Time    Accuracy Comment
+    2014        430s    66.5
+    2014        400s    66.2
+
+    2014        398s    68.2    with further preprocessing
+    2014        412s    64.0
+
+    201         32s     60.9
+    201         27s     60.9
+    201         33s     63.4
+
+    201         33s     58.5    with further preprocessing
+    201         31s     70.7    with further preprocessing
+    201         33s     60.9    with further preprocessing
+    201         30s     56.0    with further preprocessing

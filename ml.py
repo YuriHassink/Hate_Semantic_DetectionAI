@@ -1,10 +1,13 @@
 # Needed!!!
 # pip install scikit-learn
 ##pip install seaborn
+import math
+
 import optional as optional
 import transformers as ppb
 import numpy as np
 import torch
+import torch.nn as nn
 import os
 import time
 #import hardware_control
@@ -46,7 +49,7 @@ def convertLabelToBinary(fileObject)->object:
             fileObject[i]=0
         else:
             print(label)
-            raise Exception("undecided in this function, should have been selected out in preprocessing")
+            raise Exception("undecided row given to convertLabelToBinary(), should have been selected out in preprocessing")
         print(fileObject[i])
         i+=1
     return fileObject
@@ -157,23 +160,6 @@ def doBERT(modelSelected :str):
     y_pred=clf.predict(Test_X)
     evaluateAndPrintModel(y_pred, "BERT with LogisticRegression","")
 
-    """ runs table:
-    Rowcount    Time    Accuracy Comment
-    2014        430s    66.5
-    2014        400s    66.2
-    
-    2014        398s    68.2    with further preprocessing
-    2014        412s    64.0
-    
-    201         32s     60.9
-    201         27s     60.9
-    201         33s     63.4
-    
-    201         33s     58.5    with further preprocessing
-    201         31s     70.7    with further preprocessing
-    201         33s     60.9    with further preprocessing         
-    201         30s     56.0    with further preprocessing     
-    """
 
 """
 input:
@@ -208,7 +194,6 @@ def evaluateAndPrintModel(testPrediction, modelname :str, specification: str):
     print("")
 
 #BERT encodings stuff:
-
 def encodeBERT(x,tokenizer):
     if x==None:
         x=""
@@ -227,6 +212,22 @@ def calcLastStatesBert(padded, attention_mask, model):
     attention_mask1 = torch.tensor(attention_mask)
     with torch.no_grad():
         return model(input_ids1, attention_mask=attention_mask1)
+
+#DL support funcs:
+
+def sigmoid(x):
+    return 1/(1 + math.exp(-x))
+
+"""
+leaky relu:
+f(x)= 0.01x, x<0
+    = x,   x>=0
+    """
+def relu(x):
+  if x>0 :
+    return x
+  else :
+    return 0.01*x
 
 
 
